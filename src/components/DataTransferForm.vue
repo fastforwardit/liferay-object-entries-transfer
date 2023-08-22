@@ -89,8 +89,7 @@
       <label>Password: </label>
       <input v-model="passwordSource" type="password" />
     </div>
-    <hr>
-    <div class="row">
+    <div class="row mt-5">
       <label>Target URL: </label>
       <input v-model="targetUrl" />
     </div>
