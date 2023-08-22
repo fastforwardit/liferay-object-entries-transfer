@@ -9,7 +9,9 @@ This web application is built using Vue.js 3 and Vite and provides a simple user
 - Provides status updates in real-time during the data fetching and transfer process.
 - Performs data transformation between fetch and transfer. Specifically, it removes the `actions` and `id`property from each item and handles paginated results using query parameters `page` and `pageSize`.
 
-## Installation and Setup
+## Disclaimer
+Probably you will face CORS issues when using it. Circumvent it by adjusting your instance's CORS settings OR install a chrome browser plugin like [this](https://chrome.google.com/webstore/detail/cors-unblock/lfhmikememgdcahcdlaciloancbhjino) 
+or for firefox [this](https://addons.mozilla.org/en-US/firefox/addon/access-control-allow-origin/) to bypass CORS.
 
 1. **Prerequisites:**
    - Make sure all Object Defitions are created in the target Liferay instance.
