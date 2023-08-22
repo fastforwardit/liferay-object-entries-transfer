@@ -1,10 +1,10 @@
 <script setup lang="ts">
     import {ref} from "vue";
 
-    const yourObject = "<your-object>"
+    const yourObject = "YOUR_OBJECT_NAME"
 
     const sourceUrl = ref(`http://localhost:8080/o/c/${yourObject}`)
-    const targetUrl = ref(`http://localhost:8088/o/c/${yourObject}/by-external-reference-code/`)
+    const targetUrl = ref(`http://localhost:8088/o/c/${yourObject}`)
     const usernameSource = ref("test@liferay.com")
     const passwordSource = ref("test1234")
     const usernameTarget = ref("test@liferay.com")
@@ -12,6 +12,7 @@
     const statusMessageExport = ref("")
     const statusMessageImport = ref("")
     const processStarted = ref(false)
+    const batchImport = ref(false)
 
     async function fetchData(url, auth) {
       const headers = new Headers();
@@ -26,10 +27,22 @@
       headers.set("Content-Type", "application/json");
       headers.set("Authorization", "Basic " + btoa(auth));
 
-      await fetch(`${targetUrl.value}${item.externalReferenceCode}`, {
+      await fetch(`${targetUrl.value}/by-external-reference-code/${item.externalReferenceCode}`, {
         method: "PUT",
         headers: headers,
         body: JSON.stringify(item),
+      });
+    }
+
+    async function updateDataBatch(targetAuth: string, data: any[]) {
+      const headers = new Headers();
+      headers.set("Content-Type", "application/json");
+      headers.set("Authorization", "Basic " + btoa(targetAuth));
+
+      await fetch(`${targetUrl.value}/batch`, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(data),
       });
     }
 
@@ -67,11 +80,17 @@
         }
       }
 
-      //for each data item call the targetUrl
-      data.forEach((item, i) => {
-        statusMessageImport.value = `Updating ${i+1}/${data.length}: ${item.externalReferenceCode}`;
-        updateData(item, targetAuth);
-      });
+      if(batchImport.value){
+        statusMessageImport.value = `Batch Importing ${data.length} items`;
+        await updateDataBatch(targetAuth, data);
+      }else{
+        //for each data item call the targetUrl
+        for (const item of data) {
+          const i = data.indexOf(item);
+          statusMessageImport.value = `Updating ${i+1}/${data.length}: ${item.externalReferenceCode}`;
+          await updateData(item, targetAuth);
+        }
+      }
     }
 </script>
 
@@ -100,6 +119,10 @@
     <div class="row">
       <label>Password: </label>
       <input v-model="passwordTarget" type="password" />
+    </div>
+      <div class="row mt-5">
+      <label>Try Batch Import:</label>
+      <input type="checkbox" v-model="batchImport" />
     </div>
     <button @click="transferData">Transfer Data</button>
   </div>
